@@ -4,7 +4,7 @@ import { AIAnalysis } from "../types";
 
 export const analyzePDFContent = async (base64Image: string): Promise<AIAnalysis> => {
   // Create a new instance right before the call to ensure the latest API key is used
-  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY || 'FAKE_API_KEY_FOR_DEVELOPMENT' });
   
   const prompt = "This is the first page of a PDF document. Analyze it and provide a JSON summary. " +
                  "Include a suggested professional title, a 2-sentence summary, and 3-5 key points found in this document.";
