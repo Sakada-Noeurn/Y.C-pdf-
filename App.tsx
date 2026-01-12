@@ -24,6 +24,8 @@ import {
 import { ConversionStatus, ConvertedPage, PDFMetadata, ExportFormat, AIAnalysis, PDFProject } from './types';
 import { loadPDF, convertPageToImage } from './services/pdfService';
 import { analyzePDFContent } from './services/geminiService';
+import { AuthProvider, useAuth } from './context/AuthContext';
+import Auth from './components/Auth';
 
 type Language = 'en' | 'km';
 
@@ -50,25 +52,25 @@ const translations = {
     converting: "Converting..."
   },
   km: {
-    welcome: "សូមស្វាគមន៍មកកាន់Y.C PDF",
-    uploadTitle: "ដាក់ឯកសារ PDF របស់អ្នកនៅទីនេះ",
-    uploadDesc: "បំប្លែងច្បាស់ៗ មិនកំណត់ទំហំឯកសារ និងសុវត្ថិភាពបំផុត។",
-    browseFiles: "ជ្រើសរើសឯកសារ",
-    filesQueue: "បញ្ជីឯកសារ",
-    addMore: "បន្ថែម PDF",
-    convertQueue: "បំប្លែងទាំងអស់",
-    winEdition: "វិទ្យាល័យព្រះមុនីវង្ស",
-    convertAll: "បំប្លែងទាំងអស់",
-    zipAll: "ទាញយកទាំងអស់ (ZIP)",
-    resolution: "កម្រិតរូបភាព",
-    gallery: "រូបភាពលទ្ធផល",
-    analysis: "ការវិភាគ AI",
-    pages: "ទំព័រ",
-    zoomIn: "ពង្រីក",
-    zoomOut: "បង្រួម",
-    resetZoom: "ដើមវិញ",
-    credit: "បង្កើតឡើងដោយក្តីស្រលាញ់",
-    converting: "កំពុងបំប្លែង..."
+    welcome: "áá¼ááááá¶áááááááá¶ááY.C PDF",
+    uploadTitle: "áá¶ááá¯ááá¶á PDF ááááá¢ááááááá¸ááá",
+    uploadDesc: "ááááááááááá¶ááá áá·ááááááááá áá¯ááá¶á áá·ááá»ááááá·áá¶ááááá»áá",
+    browseFiles: "áááá¾ááá¾áá¯ááá¶á",
+    filesQueue: "ááááá¸á¯ááá¶á",
+    addMore: "áááááá PDF",
+    convertQueue: "ááááááááá¶ááá¢áá",
+    winEdition: "áá·áááá¶ááááááááá»áá¸áááá",
+    convertAll: "ááááááááá¶ááá¢áá",
+    zipAll: "áá¶ááááá¶ááá¢áá (ZIP)",
+    resolution: "ááááá·ááá¼ááá¶á",
+    gallery: "áá¼ááá¶ááááááá",
+    analysis: "áá¶ááá·áá¶á AI",
+    pages: "ááááá",
+    zoomIn: "ááááá¸á",
+    zoomOut: "ááááá½á",
+    resetZoom: "áá¾ááá·á",
+    credit: "ááááá¾áá¡á¾áááááááá¸ááááá¶áá",
+    converting: "áááá»áááááááá..."
   }
 };
 
@@ -117,6 +119,25 @@ const TypewriterText: React.FC<{ lang: Language }> = ({ lang }) => {
 };
 
 const App: React.FC = () => {
+  const { session, loading: authLoading, isPasswordRecovery } = useAuth();
+
+  if (authLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-900">
+        <div className="w-12 h-12 border-4 border-blue-500/30 border-t-blue-500 rounded-full animate-spin"></div>
+      </div>
+    );
+  }
+
+  // Show password reset form when user clicks reset link from email
+  if (isPasswordRecovery) {
+    return <Auth initialView="reset-password" />;
+  }
+
+  if (!session) {
+    return <Auth />;
+  }
+
   const [language, setLanguage] = useState<Language>('en');
   const [projects, setProjects] = useState<PDFProject[]>([]);
   const [activeProjectId, setActiveProjectId] = useState<string | null>(null);
@@ -286,7 +307,7 @@ const App: React.FC = () => {
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className={`text-sm font-bold truncate ${activeProjectId === p.id ? 'text-indigo-900' : 'text-slate-700'}`}>{p.metadata.name}</p>
-                  <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">{p.metadata.totalPages || '?'} {t.pages} • {(p.metadata.size / (1024 * 1024)).toFixed(1)}MB</p>
+                  <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">{p.metadata.totalPages || '?'} {t.pages} â¢ {(p.metadata.size / (1024 * 1024)).toFixed(1)}MB</p>
                 </div>
                 <button onClick={(e) => { e.stopPropagation(); removeProject(p.id); }} className="p-1 text-slate-300 hover:text-red-500 transition-colors">
                   <Trash2 className="w-4 h-4" />
@@ -478,7 +499,7 @@ const App: React.FC = () => {
       {selectedPreview && (
         <div className="fixed inset-0 z-[100] bg-slate-950/95 backdrop-blur-3xl flex flex-col animate-in fade-in zoom-in-95 duration-300">
            <div className="flex items-center justify-between p-6 text-white shrink-0">
-              <span className="bg-white/10 px-6 py-2 rounded-full text-xs font-black uppercase tracking-widest border border-white/10">Page {selectedPreview.pageNumber} • PREVIEW MODE</span>
+              <span className="bg-white/10 px-6 py-2 rounded-full text-xs font-black uppercase tracking-widest border border-white/10">Page {selectedPreview.pageNumber} â¢ PREVIEW MODE</span>
               <button onClick={() => setSelectedPreview(null)} className="p-3 bg-white/10 hover:bg-white/20 rounded-2xl transition-all active:scale-95"><X className="w-8 h-8" /></button>
            </div>
            
@@ -511,4 +532,11 @@ const App: React.FC = () => {
   );
 };
 
-export default App;
+// Wrap App with AuthProvider
+const AppWithAuth = () => (
+  <AuthProvider>
+    <App />
+  </AuthProvider>
+);
+
+export default AppWithAuth;
